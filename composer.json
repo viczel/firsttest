@@ -23,5 +23,8 @@
             "brainysoft\\testmultibase\\tests\\": "tests/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "require-dev": {
+        "codeception/codeception": "^2.2"
+    }
 }
