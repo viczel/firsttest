@@ -1,0 +1,27 @@
+{
+    "name": "brainysoft/testmultibase",
+    "description": "Test API for separate data on some databases",
+    "type": "project",
+    "require": {
+        "guzzlehttp/guzzle": "^6.2",
+        "fzaninotto/faker": "^1.6"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Victor Kozmin",
+            "email": "viktor.kozmin@brainysoft.ru"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "brainysoft\\testmultibase\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "brainysoft\\testmultibase\\tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev"
+}
