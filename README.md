@@ -22,4 +22,11 @@ php vendor\codeception\codeception\codecept generate:test unit DataGenerator
 
 php vendor\codeception\codeception\codecept run unit DataGeneratorTest
 
+### Проблема с https у guzzle
 
+ SSL certificate problem: unable to get local issuer certificate
+ 
+ Download the latest cacert.pem from https://curl.haxx.se/ca/cacert.pem
+ curl.cainfo=/path/to/downloaded/cacert.pem
+ 
+ 

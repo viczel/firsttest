@@ -18,13 +18,7 @@ class DataGenerator
 
     public function __construct($oFaker)
     {
-//        $this->nSeed = $nSeed;
-        $this->oFaker = $oFaker; // Factory::create('ru_RU');
-
-//        if( $this->nSeed !== null ) {
-//            $this->oFaker->seed($this->nSeed);
-//        }
-
+        $this->oFaker = $oFaker;
     }
 
     /**
