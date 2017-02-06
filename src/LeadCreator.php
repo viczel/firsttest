@@ -36,6 +36,7 @@ class LeadCreator
      * @param array $data
      *
      * в $data каждый элемент содержит поле headers для указания там дополнительных заголовков каждого запроса
+     * в $data каждый элемент содержит поле params для указания там данных для передачи
      *
      */
     public function createConcurentRequests($method = '', $path = '', $data = []) {
@@ -53,16 +54,78 @@ class LeadCreator
             $body = '';
             for ($i = 0; $i < $total; $i++) {
                 $element = $data[$i % $nData];
+//                print_r($element);
+
+                $elementData = $element['params'];
                 $adr = $uri;
                 $aHeaders = array_merge(
                     $headers,
                     isset($element['headers']) ? $element['headers'] : []
                 );
-                if( $method  'POST' )
+
+                if( $method == 'GET' ) {
+                    $adr .= ((strpos($adr, '?') === false) ? '?' : '&') . http_build_query($elementData);
+                    $body = null;
+                }
+                else {
+                    $body = json_encode($elementData);
+                }
 //                yield $adr;
                 yield new Request($method, $adr, $aHeaders, $body);
             }
         };
+
+        return $requests;
+    }
+
+    public function sendRequest() {
+        $code = 'a1';
+        $token = 'a1';
+        $phone = '79031112233';
+        $sUrl = 'http://172.16.1.88:8082';
+
+        $aData = [
+            [
+                'headers' => [
+                    "bsauth" => $token,
+                    "customer-key" => $code,
+                    'user-key' => 1,
+                ],
+                'params' => [
+                    "lastName" => "Иванов",
+                    "firstName" => "Иван",
+                    "patronymic" => "Иванович " . $code,
+                    "sexId" => 101251,
+                    "birthDate" => "1987-07-29",
+                    "birthPlace" => "Москва",
+                    'mobilePhone' => $phone,
+                ],
+            ],
+        ];
+
+        $requests = $this->createConcurentRequests(
+            $method = 'post',
+            $path = '/bs-core/main/leads',
+            $aData
+        );
+
+        $client = new Client();
+        $aReq = $requests(1);
+        foreach ($aReq As $req) {
+            /** @var Request $req */
+//            print_r($req);
+//            echo $req->getBody() . "\n\n";
+            try {
+                $obResponse = $client->send($req, []);
+            }
+            catch (\Exception $e) {
+                $obResponse = $e;
+//                echo $e->getMessage() . "\n\n";
+            }
+//            print_r($obResponse);
+            break;
+        }
+        return $obResponse;
     }
 
     public function createLeads($aLeads) {
