@@ -28,8 +28,9 @@ class PersonAddress
     public $streetName;
 
     public function __construct(
-        $countryId = null,
         $fullAddressText = null,
+        $fiasId = null,
+        $countryId = null,
         $fiasChainText = null,
         $houseNo = null,
         $blockNo = null,
@@ -39,7 +40,6 @@ class PersonAddress
         $postalCode = null,
         $regDate = null,
         $metroStation = null,
-        $fiasId = null,
         $regionName = null,
         $localityName = null,
         $streetName = null)

@@ -8,32 +8,44 @@
 
 namespace brainysoft\testmultibase;
 
-use brainysoft\testmultibase\LeadDataInterface;
+use brainysoft\testmultibase\BaseLead;
 use brainysoft\testmultibase\PersonName;
 use brainysoft\testmultibase\PersonBirthday;
+use brainysoft\testmultibase\CreditCard;
+use brainysoft\testmultibase\PersonAddress;
+use brainysoft\testmultibase\PersonPassport;
 
-
-class Person implements \brainysoft\testmultibase\LeadDataInterface
+class Person extends BaseLead
 {
     const GENDER_MALE = 101251;    // Мужчина
     const GENDER_FEMALE = 101252;  // Женщина
 
-    public $sexId = self::GENDER_MALE; // Пол Возможные значения:  101251 - Мужчина 101252 - Женщина
 
+    public $sexId = self::GENDER_MALE; // Пол
 
     public $inn;   // ИНН.
     public $snils; // СНИЛС.
 
-    private $name = null;       // Имя
-    private $birthdate = null;  // день рождения
-    private $phones = [];       // телефоны
-    private $emails = [];       // e-mail's
-    private $passport = null;   // паспорт
+    public $childrenCount = 0;      // Количество детей.
+    public $adultChildrenCount = 0; // Количество совершенно летних детей.
+    public $dependentsCount = 0;    // Количество иждивенцев.
+
+    protected $name = null;       // Имя
+    protected $birthdate = null;  // день рождения
+
+    protected $passport = null;   // паспорт
+
+    protected $creditcard = null;   // кредитная карта
+
+    protected $addressData = [];   // Адрес проживания
+    protected $registrationAddressData = [];   // Адрес прописки
 
     public function __construct(PersonName $name, PersonBirthday $birthdate, $inn = '', $snils = '')
     {
         $this->name = $name;
         $this->birthdate = $birthdate;
+
+        $this->naturalPerson = true;
 
         $this->inn = $inn;
         $this->snils = $snils;
@@ -72,32 +84,6 @@ class Person implements \brainysoft\testmultibase\LeadDataInterface
     }
 
     /**
-     * @param string $sPhone
-     */
-    public function addPhone($sPhone = '') {
-        $sPhone = trim(preg_replace('/[^\\d]/', '', $sPhone));
-        if( !preg_match('/^[\\d]{10,}$/', $sPhone) ) {
-            throw new \InvalidArgumentException('Телефон должен состоять как миниммум из 10 циферок');
-        }
-        if( !in_array($sPhone, $this->phones) ) {
-            $this->phones[] = $sPhone;
-        }
-    }
-
-    /**
-     * @param string $email
-     */
-    public function addEmail($email = '') {
-        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
-        if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
-            throw new \InvalidArgumentException('Email не проходит проверку');
-        }
-        if( !in_array($email, $this->emails) ) {
-            $this->emails[] = $email;
-        }
-    }
-
-    /**
      *
      */
     public function setMale() {
@@ -112,72 +98,68 @@ class Person implements \brainysoft\testmultibase\LeadDataInterface
     }
 
     /**
-     * @return array
+     * @param \brainysoft\testmultibase\CreditCard $card
      */
-    public function getPhones() {
-        return [
-            'mobilePhone' => empty($this->phones) ? "" : $this->phones[0],
-        ];
+    public function setCreditcard(CreditCard $card) {
+        $this->creditcard = $card;
     }
 
     /**
      * @return array
      */
-    public function getEmails() {
-        return [
-            'email' => empty($this->email) ? "" : $this->email[0],
-        ];
-    }
-
-    /**
-     *
-     * LeadDataInterface
-     *
-     * @return array
-     */
-    public function getLeadData() {
-        return $this->getDataRecurcive($this);
-    }
-
-    /**
-     * @param $ob
-     */
-    public function getDataRecurcive($ob) {
-        $aFields = $this->getProperties($ob, \ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE);
-        $aRet = [];
-
-        foreach ($aFields As $fld) {
-            /** @var \ReflectionProperty $fld */
-            $sName = $fld->getName();
-
-            if( $fld->isPublic() ) {
-                $aRet[$sName] = $ob->{$sName};
-            }
-            else if( $fld->isPrivate() | $fld->isProtected() ) {
-                $fld->setAccessible(true);
-                $oPrivate = $fld->getValue($ob);
-                $sGetter = 'get' . ucfirst($sName);
-                if( is_object($oPrivate) ) {
-                    $aRet = array_merge($aRet, $this->getDataRecurcive($oPrivate));
-                }
-                else if( method_exists($ob, $sGetter) ) {
-                    $aRet = array_merge($aRet, $ob->{$sGetter}());
-                }
-            }
-
+    public function getCreditcard() {
+        if( empty($this->creditcard) ) {
+            return [];
         }
-        return $aRet;
+        return $this->getDataRecurcive($this->creditcard);
     }
 
     /**
-     * @param $ob
-     * @param int $nTypes
-     * @return \ReflectionProperty[]
+     * @param \brainysoft\testmultibase\PersonAddress $address
      */
-    public function getProperties($ob, $nTypes = \ReflectionProperty::IS_PUBLIC) {
-        $reflect = new \ReflectionClass($ob);
-        $aFields = $reflect->getProperties($nTypes);
-        return $aFields;
+    public function setAddressData(PersonAddress $address) {
+        $this->addressData = $address;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAddressData() {
+        return [
+            'addressData' => empty($this->addressData) ? [] : $this->getDataRecurcive($this->addressData),
+        ];
+    }
+
+    /**
+     * @param \brainysoft\testmultibase\PersonAddress $address
+     */
+    public function setRegistrationAddressData(PersonAddress $address) {
+        $this->registrationAddressData = $address;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRegistrationAddressData() {
+        return [
+            'registrationAddressData' => empty($this->registrationAddressData) ? [] : $this->getDataRecurcive($this->registrationAddressData),
+        ];
+    }
+
+    /**
+     * @param \brainysoft\testmultibase\PersonPassport $passport
+     */
+    public function setPassport(PersonPassport $passport) {
+        $this->passport = $passport;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPassport() {
+        return [
+            'passport' => empty($this->passport) ? [] : $this->getDataRecurcive($this->passport),
+        ];
     }
 
 }
