@@ -129,7 +129,7 @@ class Person extends BaseLead
      */
     public function getAddressData() {
         return [
-            'addressData' => empty($this->addressData) ? [] : $this->getDataRecurcive($this->addressData),
+            'addressData' => empty($this->addressData) ? $this->getDataRecurcive(new PersonAddress()) : $this->getDataRecurcive($this->addressData),
         ];
     }
 
@@ -145,7 +145,7 @@ class Person extends BaseLead
      */
     public function getRegistrationAddressData() {
         return [
-            'registrationAddressData' => empty($this->registrationAddressData) ? [] : $this->getDataRecurcive($this->registrationAddressData),
+            'registrationAddressData' => empty($this->registrationAddressData) ? $this->getDataRecurcive(new PersonAddress()) : $this->getDataRecurcive($this->registrationAddressData),
         ];
     }
 
@@ -161,7 +161,7 @@ class Person extends BaseLead
      */
     public function getPassport() {
         return [
-            'passport' => empty($this->passport) ? [] : $this->getDataRecurcive($this->passport),
+            'passport' => empty($this->passport) ? null : $this->getDataRecurcive($this->passport),
         ];
     }
 

@@ -55,6 +55,7 @@ class PersonTest extends \Codeception\Test\Unit
             'employerInn',
 
 
+            'id',
             'channel',
             'naturalPerson',
             'addresses',
@@ -100,7 +101,7 @@ class PersonTest extends \Codeception\Test\Unit
 
             'currentStatus',
 
-            'getter',
+//            'getter',
         ];
 
         $aFields = $oPerson->getLeadData();

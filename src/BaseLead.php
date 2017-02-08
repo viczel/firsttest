@@ -19,6 +19,7 @@ abstract class BaseLead implements \brainysoft\testmultibase\LeadDataInterface
                                             // систему принятия решения для определения кредитного
                                             // лимита клиента. Созданные контракты нельзя будет выдать.
 
+    public $id = null;                    //
     public $channel = self::CHANNEL_SITE; // Канал поступления
 
     public $naturalPerson = true;   // Физическое лицо
@@ -190,7 +191,7 @@ abstract class BaseLead implements \brainysoft\testmultibase\LeadDataInterface
             $sGetter = 'get' . ucfirst($sName);
 
             // TODO: Это просто для отладки, чтобы видеть, что происходит с геттерами, в тестах надо убрать при удалении
-            $aRet['getter'] = isset($aRet['getter']) ? ($aRet['getter'] . ' ' . $sGetter) : $sGetter;
+//            $aRet['getter'] = isset($aRet['getter']) ? ($aRet['getter'] . ' ' . $sGetter) : $sGetter;
 
             if( method_exists($ob, $sGetter) ) {
                 $aRet = array_merge($aRet, $ob->{$sGetter}());

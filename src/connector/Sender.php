@@ -111,4 +111,8 @@ class Sender
         return json_decode($this->response->getBody()->getContents());
     }
 
+    public function convertTo866($s = '') {
+        return iconv('UTF-8', 'CP866', $s);
+    }
+
 }
