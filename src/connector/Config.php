@@ -16,4 +16,11 @@ class Config
     public $userkey = 1;
     public $baseurl = '';
 
+    public function __construct($customer, $baseurl, $bsauth, $userkey )
+    {
+        $this->customer = $customer;
+        $this->baseurl = $baseurl;
+        $this->bsauth = $bsauth;
+        $this->userkey = $userkey;
+    }
 }

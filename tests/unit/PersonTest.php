@@ -4,6 +4,8 @@ use brainysoft\testmultibase\Person;
 use brainysoft\testmultibase\PersonName;
 use brainysoft\testmultibase\PersonBirthday;
 use brainysoft\testmultibase\PersonAddress;
+use brainysoft\testmultibase\Employer;
+use brainysoft\testmultibase\Credit;
 
 class PersonTest extends \Codeception\Test\Unit
 {
@@ -49,6 +51,8 @@ class PersonTest extends \Codeception\Test\Unit
             'addressData',
             'registrationAddressData',
             'passport',
+            'employerTitle',
+            'employerInn',
 
 
             'channel',
@@ -61,14 +65,40 @@ class PersonTest extends \Codeception\Test\Unit
             'email',
             'ipAddress',
             'macAddress',
-            "ipAndRegionMatch",
-            "ipAndRegAddressMatch",
-            "mobilePhoneCheck",
-            "rosfinmonitoringCheck",
-            "ufmsCheck",
-            "approvedByScorista",
+            'ipAndRegionMatch',
+            'ipAndRegAddressMatch',
+            'mobilePhoneCheck',
+            'rosfinmonitoringCheck',
+            'ufmsCheck',
+            'approvedByScorista',
+            'orderCode',
+            'storeCode',
+            'storeTypeId',
+            'referralLink',
+            'deviceTypeId',
+            'denialReasonId',
+            'relatives',
+            'gettingMoneyMethodId',
+            'amount',
+            'intRate',
+            'period',
+            'periodUnit',
 
-            "currentStatus",
+            'totalAmount',
+            'totalAmountDelinq30',
+            'meanIncome',
+            'averageMonthlyCost',
+            'monthlyCreditPayment',
+            'closedCreditsCount',
+            'delinquencyCount',
+            'payedDelinquencyCount',
+            'writtenDelinquencyCount',
+            'activeCreditsCount',
+            'activeCreditsAmount',
+            'activeDelinquencyAmount',
+
+
+            'currentStatus',
 
             'getter',
         ];
@@ -142,7 +172,7 @@ class PersonTest extends \Codeception\Test\Unit
         $oPerson->addPhone('9015556677');
 
         $aPhones = $oPerson->getAllPhones();
-        $this->assertCount(2, $aPhones, 'Phones must has 2 phones. Current phones:' . implode(', ', $aPhones));
+        $this->assertCount(2, $aPhones, 'Phones must has 2 elements. Current elements:' . implode(', ', $aPhones));
 
 
         $aFields = $oPerson->getLeadData();
@@ -150,6 +180,31 @@ class PersonTest extends \Codeception\Test\Unit
         $this->assertArrayHasKey('mobilePhone', $aFields, 'Array need key "mobilePhone" ' . print_r($aFields, true));
         $this->assertEquals($basePhone, $aFields['mobilePhone'], 'Mobile phone need to be ' . $basePhone);
 
+    }
+
+    /**
+     *
+     */
+    public function testAddLeadEmail()
+    {
+        $sFirstName = 'Petr';
+        $sLastName = 'Ivanov';
+        $oPerson = Person::createFemale(
+            new PersonName($sFirstName, $sLastName),
+            new PersonBirthday()
+        );
+
+        $baseEmail = 'test@example.com';
+        $oPerson->addEmail($baseEmail);
+        $oPerson->addEmail('test@mfsa.ru');
+
+        $aEmails = $oPerson->getAllEmails();
+        $this->assertCount(2, $aEmails, 'Emails must has 2 elements. Current elements:' . implode(', ', $aEmails));
+
+        $aFields = $oPerson->getLeadData();
+
+        $this->assertArrayHasKey('email', $aFields, 'Array need key "email" ' . print_r($aFields, true));
+        $this->assertEquals($baseEmail, $aFields['email'], 'Email need to be ' . $baseEmail . ' current: ' . $aFields['email']);
     }
 
     /**
@@ -200,5 +255,52 @@ class PersonTest extends \Codeception\Test\Unit
         $this->assertEquals($fiasId, $aFields['registrationAddressData']['fiasId'], 'fiasId need to be ' . $fiasId);
     }
 
+    /**
+     *
+     */
+    public function testAddEmployer()
+    {
+        $sFirstName = 'Petr';
+        $sLastName = 'Ivanov';
+        $oPerson = Person::createFemale(
+            new PersonName($sFirstName, $sLastName),
+            new PersonBirthday()
+        );
 
+        $sEmplTitle = 'Employertest';
+        $sEmplInn = 1234567891;
+
+        $oPerson->setEmployer(new Employer($sEmplTitle, $sEmplInn));
+        $aFields = $oPerson->getLeadData();
+
+        $this->assertEquals($sEmplTitle, $aFields['employerTitle'], 'Employer Title: ' . $sEmplTitle . ' != ' . $aFields['employerTitle']);
+        $this->assertEquals($sEmplInn, $aFields['employerInn'], 'Employer Inn: ' . $sEmplTitle . ' != ' . $aFields['employerInn']);
+    }
+
+    /**
+     *
+     */
+    public function testSetCredit()
+    {
+        $sFirstName = 'Petr';
+        $sLastName = 'Ivanov';
+        $oPerson = Person::createFemale(
+            new PersonName($sFirstName, $sLastName),
+            new PersonBirthday()
+        );
+
+        $sum = 10000;
+        $procent = 10;
+        $period = 3;
+        $unit = Credit::CREDIT_PERIOD_WEEKS;
+
+        $oPerson->setCredit(new Credit($sum, $procent, $period, $unit));
+
+        $aFields = $oPerson->getLeadData();
+
+        $this->assertEquals($sum, $aFields['amount'], 'Credit summ: ' . $sum . ' != ' . $aFields['amount']);
+        $this->assertEquals($procent, $aFields['intRate'], 'Credit rate: ' . $procent . ' != ' . $aFields['intRate']);
+        $this->assertEquals($period, $aFields['period'], 'Credit period: ' . $period . ' != ' . $aFields['period']);
+        $this->assertEquals($unit, $aFields['periodUnit'], 'Credit period unit: ' . $unit . ' != ' . $aFields['periodUnit']);
+    }
 }

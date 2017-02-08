@@ -14,6 +14,7 @@ use brainysoft\testmultibase\PersonBirthday;
 use brainysoft\testmultibase\CreditCard;
 use brainysoft\testmultibase\PersonAddress;
 use brainysoft\testmultibase\PersonPassport;
+use brainysoft\testmultibase\Employer;
 
 class Person extends BaseLead
 {
@@ -39,6 +40,8 @@ class Person extends BaseLead
 
     protected $addressData = [];   // Адрес проживания
     protected $registrationAddressData = [];   // Адрес прописки
+
+    protected $employer = null;
 
     public function __construct(PersonName $name, PersonBirthday $birthdate, $inn = '', $snils = '')
     {
@@ -160,6 +163,20 @@ class Person extends BaseLead
         return [
             'passport' => empty($this->passport) ? [] : $this->getDataRecurcive($this->passport),
         ];
+    }
+
+    /**
+     * @param \brainysoft\testmultibase\Employer $employer
+     */
+    public function setEmployer(Employer $employer) {
+        $this->employer = $employer;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEmployer() {
+        return $this->getDataRecurcive(empty($this->employer) ? new Employer() : $this->employer);
     }
 
 }

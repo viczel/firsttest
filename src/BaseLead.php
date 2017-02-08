@@ -9,6 +9,7 @@
 namespace brainysoft\testmultibase;
 
 use brainysoft\testmultibase\ExtraField;
+use brainysoft\testmultibase\Credit;
 
 abstract class BaseLead implements \brainysoft\testmultibase\LeadDataInterface
 {
@@ -43,9 +44,32 @@ abstract class BaseLead implements \brainysoft\testmultibase\LeadDataInterface
 
     public $currentStatus = null;          // Текущий статус лида.
     public $orderCode = '';                // Код заказа поступивший от партнеров
+    public $storeCode = '';                // Идентификатор магазина для создания лидов
+    public $storeTypeId = null;            // Идентификатор типа магазина
+    public $referralLink = '';             //
+    public $deviceTypeId = null;           // Идентификатор типа доставки
+    public $denialReasonId = null;         // Идентификатор причины отказа
+    public $totalAmount = 0;               //
+    public $totalAmountDelinq30 = 0;       //
 
-    protected $phones = [];       // телефоны
-    protected $emails = [];       // e-mail's
+    public $meanIncome = 0.0;              // Среднемесячный доход
+    public $averageMonthlyCost = 0.0;      // Ежемесячные расходы
+    public $monthlyCreditPayment = 0.0;    // Ежемесячные платежи по кредитам
+    public $closedCreditsCount = 0;        // Количество закрытых кредитов
+    public $delinquencyCount = 0;          // Количество просрочек
+    public $payedDelinquencyCount = 0;     // Количество платежей с просрочкой
+    public $writtenDelinquencyCount = 0;   // Количество списанных просроченных платежей
+    public $activeCreditsCount = 0;        // Количество активных кредитов
+    public $activeCreditsAmount = 0.0;     // Суммарный долг по активным кредитам
+    public $activeDelinquencyAmount = 0.0; // Сумма текущих просроченных платежей
+
+    public $relatives = [];                // Родственники
+
+    public $gettingMoneyMethodId = null;   // Идентификатор способа получения займа. Метод получения списка "Способа получения займа"
+
+    protected $phones = [];                // телефоны
+    protected $emails = [];                // e-mail's
+    protected $credit = [];                // кредит
 
     /**
      * @param $channel
@@ -94,7 +118,7 @@ abstract class BaseLead implements \brainysoft\testmultibase\LeadDataInterface
      * @return array
      */
     public function getAllEmails() {
-        return $this->email;
+        return $this->emails;
     }
 
     /**
@@ -117,7 +141,7 @@ abstract class BaseLead implements \brainysoft\testmultibase\LeadDataInterface
      */
     public function getEmails() {
         return [
-            'email' => empty($this->email) ? "" : $this->email[0],
+            'email' => empty($this->emails) ? "" : $this->emails[0],
         ];
     }
 
@@ -157,21 +181,25 @@ abstract class BaseLead implements \brainysoft\testmultibase\LeadDataInterface
             /** @var \ReflectionProperty $fld */
             $sName = $fld->getName();
 
-            if( $fld->isPrivate() || $fld->isProtected() ) {
+            $bPrivate = $fld->isPrivate() || $fld->isProtected();
+            if( $bPrivate ) {
                 $fld->setAccessible(true);
             }
 
-            $oPrivate = $fld->getValue($ob);
+            $oValue = $fld->getValue($ob);
             $sGetter = 'get' . ucfirst($sName);
+
+            // TODO: Это просто для отладки, чтобы видеть, что происходит с геттерами, в тестах надо убрать при удалении
             $aRet['getter'] = isset($aRet['getter']) ? ($aRet['getter'] . ' ' . $sGetter) : $sGetter;
+
             if( method_exists($ob, $sGetter) ) {
                 $aRet = array_merge($aRet, $ob->{$sGetter}());
             }
-            else if( is_object($oPrivate) ) {
-                $aRet = array_merge($aRet, $this->getDataRecurcive($oPrivate));
+            else if( is_object($oValue) ) {
+                $aRet = array_merge($aRet, $this->getDataRecurcive($oValue));
             }
-            else {
-                $aRet[$sName] = $oPrivate; // $ob->{$sName};
+            else if( !$bPrivate ) {
+                $aRet[$sName] = $oValue; // $ob->{$sName};
             }
 
         }
@@ -187,6 +215,29 @@ abstract class BaseLead implements \brainysoft\testmultibase\LeadDataInterface
         $reflect = new \ReflectionClass($ob);
         $aFields = $reflect->getProperties($nTypes);
         return $aFields;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRelatives() {
+        return [
+            'relatives' => [],
+        ];
+    }
+
+    /**
+     * @param \brainysoft\testmultibase\Credit $credit
+     */
+    public function setCredit(Credit $credit) {
+        $this->credit = $credit;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCredit() {
+        return $this->getDataRecurcive(empty($this->credit) ? new Credit() : $this->credit);
     }
 
     /*
@@ -219,6 +270,33 @@ BaseLead
                 "approvedByScorista" => false,
 
                 "orderCode" => null,
+                "storeCode" => null,
+                "storeTypeId" => null,
+                "referralLink" => "",
+                "totalAmount" => 0,
+                "totalAmountDelinq30" => 0,
+                "denialReasonId" => null,
+
+                "meanIncome" => 0.0,           // Среднемесячный доход
+                "averageMonthlyCost" => 0.0,   // Ежемесячные расходы
+                "monthlyCreditPayment" => 0.0, // Ежемесячные платежи по кредитам
+                "closedCreditsCount" => 0,     // Количество закрытых кредитов
+                "delinquencyCount" => 0,       // Количество просрочек
+                "payedDelinquencyCount" => 0,  // Количество платежей с просрочкой
+                "writtenDelinquencyCount" => 0,// Количество списанных просроченных платежей
+                "activeCreditsCount" => 0,     // Количество активных кредитов
+                "activeCreditsAmount" => 0.0,  // Суммарный долг по активным кредитам
+                "activeDelinquencyAmount" => 0.0,// Сумма текущих просроченных платежей
+
+                "gettingMoneyMethodId" => null,
+
+                "amount" => 0,  // Сумма займа
+                "intRate" => 0, // Процентная ставка
+                "period" => 0,  // Запрашиваемый срок займа
+                "periodUnit" => "DAYS", // Срок займа (DAYS;WEEKS)
+
+
+                "relatives" => [],
 
 ------------------------------------------------------------------------------------------
 Person
@@ -248,46 +326,17 @@ Person
                 "addressData" => []
                 "registrationAddressData" => []
 
+                "employerTitle" => "",
+                "employerInn" => ""
+
 ------------------------------------------------------------------------------------------
                 "title" => "", // Наименование организации (Для Юридического лица)
                 "registrationNumber" => "", // Номер ОГРН (Для Юридического лица)
 
-                "relatives" => [],
+                "leadDebts" => [], //
 
-                "leadDebts" => [],
-                "amount" => 0,
-                "period" => 0,
-                "periodUnit" => "DAYS",
-                "gettingMoneyMethodId" => null,
-                "goods" => [],
+                "goods" => [], // Список товаров
 
-                "storeTypeId" => null,
-
-                "employerTitle" => "",
-                "employerInn" => "",
-
-                "meanIncome" => 0.0,
-                "averageMonthlyCost" => 0.0,
-                "monthlyCreditPayment" => 0.0,
-                "closedCreditsCount" => 0,
-                "delinquencyCount" => 0,
-                "payedDelinquencyCount" => 0,
-                "writtenDelinquencyCount" => 0,
-                "activeCreditsCount" => 0,
-                "activeCreditsAmount" => 0.0,
-                "activeDelinquencyAmount" => 0.0,
-
-                "denialReasonId" => null,
-
-                "storeCode" => null,
-
-
-                "deviceTypeId" => null,
-                "referralLink" => "",
-                "intRate" => 0,
-
-                "totalAmount" => 0,
-                "totalAmountDelinq30" => 0,
 
             ];
 
