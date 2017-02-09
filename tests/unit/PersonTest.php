@@ -122,6 +122,13 @@ class PersonTest extends \Codeception\Test\Unit
         $this->assertEquals('', $aFields['snils']);
         $this->assertEquals('', $aFields['patronymic']);
         $this->assertEquals('', $aFields['birthPlace']);
+        $this->assertEquals(null, $aFields['mobilePhone']);
+
+        $this->assertArrayHasKey('countryId', $aFields['addressData']);
+        $this->assertEquals(null, $aFields['addressData']['countryId']);
+
+        $this->assertArrayHasKey('countryId', $aFields['registrationAddressData']);
+        $this->assertEquals(null, $aFields['registrationAddressData']['countryId']);
 
         $this->assertEquals(Person::GENDER_MALE, $aFields['sexId']);
     }

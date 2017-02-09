@@ -30,9 +30,22 @@ php vendor\codeception\codeception\codecept run unit DataGeneratorTest
  curl.cainfo=/path/to/downloaded/cacert.pem
  
  
- ###Новый тест для обращений к API
+###Новый тест для обращений к API
  hp vendor\codeception\codeception\codecept generate:test unit LeadCreator
  
  php vendor\codeception\codeception\codecept run unit LeadCreatorTest
  
+### Разные пути
  
+ /bs-core/utils/version-info  
+ 
+ /bs-core/dicts/custom/config
+ 
+ 
+### После запуска лида в проверку получил
+ 
+на команду php getDictionary.php --customer=b2 --path=/bs-core/main/leads/19
+ 
+    [currentStatus] => TECH_FAULT
+    [currentBusinessStatus] => FAILED
+

@@ -33,6 +33,7 @@ $oSender->send('post', '/bs-core/main/leads', $data);
 
 if( !$oSender->hasError() ) {
     print_r($oSender->getData());
+    $responseData = $oSender->getData();
 }
 else {
     $oErr = $oSender->getError()->getResponse()->getBody();

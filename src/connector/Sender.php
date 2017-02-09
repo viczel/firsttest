@@ -20,6 +20,8 @@ class Sender
      */
     private $config = null;
 
+    private $client = null;
+
     /** @var array $aHeaders */
     private $headers = [];
 
@@ -29,13 +31,15 @@ class Sender
 
     private $response = null;
 
-    public function __construct(Config $config, $headers = [])
+    public function __construct(Config $config, $headers = [], $client = null)
     {
         $this->config = $config;
         $this->headers = $headers;
+        $this->client = ($client === null) ? new Client() : $client;
     }
 
     /**
+     *
      * @param string $method
      * @param string $path
      * @param array $data
@@ -59,7 +63,10 @@ class Sender
         $url = $this->config->baseurl . $path;
 
         if( $method == 'GET' ) {
-            $url .= ((strpos($url, '?') === false) ? '?' : '&') . http_build_query($data);
+            $sParam = http_build_query($data);
+            if( strlen($sParam) > 0 ) {
+                $url .= ((strpos($url, '?') === false) ? '?' : '&') . $sParam;
+            }
             $body = null;
         }
         else {
@@ -74,19 +81,36 @@ class Sender
         ];
 
         $this->oError = null;
-        $client = new Client();
         $request = new Request($method, $url, $headers, $body);
+        $content = '';
 
         try {
-            $response = $client->send($request);
+            $response = $this->client->send($request);
+//            print_r($response->getBody());
+            $content = $response->getBody()->getContents();
+            $obReturn = json_decode($content);
+//            echo "status = {$obReturn->status}\n";
+//            echo substr(print_r($obReturn, true), 0, 300) . "\n...................\n";
+            if( $obReturn->status != 'ok' ) {
+//                print_r($aData);
+                $this->oError = $obReturn;
+                $response = null;
+            }
+            else {
+                $response = $obReturn;
+            }
         }
         catch (\Exception $e ) {
+            if( method_exists($e, 'getResponse') ) {
+                $e = json_decode($e->getResponse()->getBody()->getContents());
+            }
             $this->oError = $e;
             $response = null;
         }
 
         $this->response = $response;
-        return $response;
+//        echo substr(print_r($this->response, true), 0, 300) . "\n...................\n";
+        return $this->response;
     }
 
     /**
@@ -104,11 +128,12 @@ class Sender
     }
 
     public function getData() {
-        if( $this->response === null ) {
-            return [];
-        }
-
-        return json_decode($this->response->getBody()->getContents());
+        return $this->response;
+//        if( $this->response === null ) {
+//            return [];
+//        }
+//
+//        return json_decode($this->response->getBody()->getContents());
     }
 
     public function convertTo866($s = '') {

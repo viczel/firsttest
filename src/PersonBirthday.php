@@ -38,4 +38,18 @@ class PersonBirthday
 
     }
 
+    /**
+     * @return false|int
+     */
+    public function getDate() {
+        return strtotime($this->birthDate);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlace() {
+        return $this->birthPlace;
+    }
+
 }
