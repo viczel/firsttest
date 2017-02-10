@@ -20,6 +20,7 @@ $obOpt = new CliOptions(['customer:', 'client::', 'path::']);
 
 $customerId = $obOpt->getOption('customer', 'a1');
 $path = $obOpt->getOption('path', '/bs-core/dicts/credit-products');
+$clientId = $obOpt->getOption('client', 0);
 
 //$oConf = ConfigFactory::createConfig($customerId);
 //$oSender = new Sender($oConf, ["Content-Type" => "application/json",]);
@@ -49,12 +50,14 @@ $oSender = SenderFactory::createSender($customerId);
 //}
 //die();
 
-/*
 
+/*
 $oFaker = Factory::create('ru_Ru');
 $oGenerator = new DataGenerator($oFaker);
 
 $adapter = new ApiAdapter($oSender);
+
+//$aProducts = $adapter->getTestStatuses($clientId);
 
 //$aProducts = $adapter->getProductList();
 $aProducts = $adapter->getRawProductList();
@@ -67,6 +70,7 @@ $aProducts = $adapter->getRawProductList();
 
 echo 'Error: ' . $oSender->convertTo866(print_r($adapter->getError(), true)) . "\n";
 echo 'Products: ' . $oSender->convertTo866(print_r($aProducts, true)) . "\n";
+//die();
 
 $params = [
     'products' => $aProducts, // array_keys($aProducts),

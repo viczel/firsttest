@@ -13,6 +13,7 @@ use brainysoft\testmultibase\PersonName;
 use brainysoft\testmultibase\PersonBirthday;
 use brainysoft\testmultibase\Credit;
 use brainysoft\testmultibase\PersonPassport;
+use brainysoft\testmultibase\PersonSnils;
 
 class DataGenerator
 {
@@ -127,6 +128,18 @@ class DataGenerator
         );
 
         // -------------------------------- LOAN_AMOUNT_GREATER_THAN_MAX_LOAN_AMOUNT_ERROR
+        // после этого написал создание кредита по продукту
+        // теперь статус проверки стал
+        // [status] => TECH_FAULT
+        // [info] => code: METADATA__EMPTY_REQUIRED_FIELD; message: snils
+
+        $snils = new PersonSnils();
+
+        $oPerson->snils = $snils->generateSnils();
+
+        //  [status] => TECH_FAULT
+        //  [info] => code: METADATA__EMPTY_REQUIRED_FIELD; message: gettingMoneyMethodId
+
 
         return $oPerson;
     }

@@ -31,7 +31,7 @@ php vendor\codeception\codeception\codecept run unit DataGeneratorTest
  
  
 ###Новый тест для обращений к API
- hp vendor\codeception\codeception\codecept generate:test unit LeadCreator
+ php vendor\codeception\codeception\codecept generate:test unit LeadCreator
  
  php vendor\codeception\codeception\codecept run unit LeadCreatorTest
  

@@ -202,5 +202,31 @@ class ApiAdapter
         return $result;
     }
 
+    /**
+     * @param int $leadId
+     * @return array
+     */
+    public function getTestStatuses($leadId = 0) {
+        $result = $this->execute('get', '/bs-core/main/leads/' . intval($leadId) . '/statuses');
+        return $result;
+    }
+
+    /**
+     * @param int $id
+     * @return array
+     */
+    public function getContract($id) {
+        $result = $this->execute('get', '/bs-core/main/contracts/' . intval($id));
+        return $result;
+    }
+
+    /**
+     * @param int $id
+     * @return array
+     */
+    public function getClient($id) {
+        $result = $this->execute('get', '/bs-core/main/clients/' . intval($id));
+        return $result;
+    }
 
 }
