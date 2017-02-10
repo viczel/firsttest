@@ -24,17 +24,17 @@ class DataGeneratorTest extends \Codeception\Test\Unit
         $oFaker = Factory::create('ru_Ru');
 
         $oFaker->seed(100);
-        $sFirstName = 'Назар';
-        $sLastName = 'Дорофеев';
+        $sFirstName = 'Егор';
+        $sLastName = 'Лапин';
         $sBithPlace = 'Одинцово';
         $sBirthDate = '1980-08-17';
-        $amount = 50000;
-        $intRate = 14;
-        $period = 130;
-        $creditProductId = 6;
+        $amount = 0;
+        $intRate = 0;
+        $period = 0;
+        $creditProductId = null;
 
         $params = [
-            'products' => [1, 2, 3, 4, 5, 6],
+//            'products' => [1, 2, 3, 4, 5, 6],
         ];
 
         $oGenerator = new DataGenerator($oFaker);
@@ -75,6 +75,27 @@ class DataGeneratorTest extends \Codeception\Test\Unit
 //        );
     }
 
+    public function testManyLeads()
+    {
+        $oFaker = Factory::create('ru_Ru');
+
+        $params = [
+        ];
+
+        $oGenerator = new DataGenerator($oFaker);
+        $aLead = [];
+
+        for($i = 0; $i < 10; $i++) {
+            $aLead[$i] = $oGenerator->generateOneLead($params);
+        }
+
+        for($i = 0; $i < 9; $i++) {
+            $a1 = $aLead[$i]->getLeadData();
+            $a2 = $aLead[$i+1]->getLeadData();
+            $this->assertNotEquals($a1['firstName'], $a2['firstName'], $this->convertTo866('Name must be not equal (' . $i . ' ' . ($i + 1) . ') ' . $a2['firstName'] . ' != ' . $a2['firstName']));
+        }
+    }
+
     /**
      * @param string $s
      * @return string
@@ -82,4 +103,7 @@ class DataGeneratorTest extends \Codeception\Test\Unit
     public function convertTo866($s) {
         return iconv('UTF-8', 'CP866', $s);
     }
+
+
+
 }

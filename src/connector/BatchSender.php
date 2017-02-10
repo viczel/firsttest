@@ -66,7 +66,10 @@ class BatchSender
         $url = $config->baseurl . $path;
 
         if( $method == 'GET' ) {
-            $url .= ((strpos($url, '?') === false) ? '?' : '&') . http_build_query($data);
+            $sParam = http_build_query($data);
+            if( !empty($sParam) ) {
+                $url .= ((strpos($url, '?') === false) ? '?' : '&') . $sParam;
+            }
             $body = null;
         }
         else {
@@ -80,6 +83,15 @@ class BatchSender
             'body' => $body,
         ];
 //        yield new Request($method, $url, $aHeaders, $body);
+    }
+
+    /**
+     *
+     */
+    public function clearRequests() {
+        $this->aRequest = [];
+        $this->aResponse = [];
+        $this->aErrors = [];
     }
 
     /**
@@ -145,8 +157,10 @@ class BatchSender
 
         return [
             'request' => $this->aRequest[$index],
-            'response' => isset($this->aResponse[$index]) ? $this->aResponse[$index] : null,
+            'response' => isset($this->aResponse[$index]) ? $this->aResponse[$index]->getBody()->getContents() : null,
+            'headers' => isset($this->aResponse[$index]) ? $this->aResponse[$index]->getHeaders() : null,
             'error' => isset($this->aErrors[$index]) ? $this->aErrors[$index] : null,
+            'customer' => $this->aRequest[$index]['headers']['customer-key'],
         ];
     }
 

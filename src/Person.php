@@ -65,7 +65,7 @@ class Person extends BaseLead
      * @return Person
      */
     public static function createMale(PersonName $name, PersonBirthday $birthdate, $inn = '', $snils = '') {
-        $ob = new self($name, $birthdate, $inn, $snils);
+        $ob = new Person($name, $birthdate, $inn, $snils);
         $ob->setMale();
         return $ob;
     }
@@ -81,7 +81,7 @@ class Person extends BaseLead
      * @return Person
      */
     public static function createFemale(PersonName $name, PersonBirthday $birthdate, $inn = '', $snils = '') {
-        $ob = new self($name, $birthdate, $inn, $snils);
+        $ob = new Person($name, $birthdate, $inn, $snils);
         $ob->setFemale();
         return $ob;
     }

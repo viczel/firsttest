@@ -229,4 +229,24 @@ class ApiAdapter
         return $result;
     }
 
+    /**
+     * @param int $id
+     * @return array
+     */
+    public function getGettingMonewMethods() {
+        $result = $this->execute('get', '/bs-core/dicts/getting-money-methods');
+        return $result;
+    }
+
+    /**
+     * @param array $aStatuses
+     * @return object
+     */
+    public function getLastTestStatus($aStatuses = []) {
+        if( count($aStatuses) > 0 ) {
+            return $aStatuses[0];
+        }
+        return null;
+    }
+
 }

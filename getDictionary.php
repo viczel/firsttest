@@ -50,8 +50,8 @@ $oSender = SenderFactory::createSender($customerId);
 //}
 //die();
 
-
 /*
+
 $oFaker = Factory::create('ru_Ru');
 $oGenerator = new DataGenerator($oFaker);
 
@@ -73,7 +73,9 @@ echo 'Products: ' . $oSender->convertTo866(print_r($aProducts, true)) . "\n";
 //die();
 
 $params = [
-    'products' => $aProducts, // array_keys($aProducts),
+    'products' => $aProducts,
+    'gettingmoneymethod' => $adapter->getGettingMonewMethods(),
+    'customerid' => $customerId,
 ];
 
 $oLead = $oGenerator->generateOneLead($params);
@@ -93,6 +95,16 @@ if( $adapter->hasError() ) {
 }
 else {
     echo 'Start lead test: ok ' . $oSender->convertTo866(print_r($aRes, true)) . "\n";
+    sleep(10);
+    $aTestStatuses = $adapter->getTestStatuses($nLeadId);
+//    echo 'Status : ' . $oSender->convertTo866(print_r($aTestStatuses, true)) . "\n";
+    $oStatus = $adapter->getLastTestStatus($aTestStatuses);
+    if( $oStatus->status != 'APPROVED' ) {
+        echo 'Test status: ' . $oSender->convertTo866(print_r($oStatus, true)) . "\n";
+    }
+    else {
+        echo "Test status: ok\n";
+    }
 }
 //echo $oSender->convertTo866(print_r($adapter->prepareLeadList($adapter->getLeadList('2017-02-08T15:00:00', '2017-02-08T20:00:00')), true));
 // print_r($adapter->getCustomerConfig());
@@ -130,6 +142,8 @@ function filterdata($path = '', $data = []) {
         return reduceCreditproducts($data);
     }
     else if( strpos($path, '/bs-core/main/leads/find') === 0 ) {
+//        end($data);
+//        $data = current($data);
         return reduceLeads($data);
     }
     return $data;
@@ -160,7 +174,9 @@ function reduceLeads($data) {
                 . ' ' . $el->patronymic
                 . ' ' . date('d.m.Y H:i:s', $t)
                 . ' ' . $el->channel
-                . ' ' . $el->mobilePhone;
+                . ' ' . $el->email
+                . ' ' . $el->mobilePhone
+                . ' ' . $el->currentStatus;
 
             return $carry;
         },

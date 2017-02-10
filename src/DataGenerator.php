@@ -66,16 +66,32 @@ class DataGenerator
          * Для успешного создания лида нужны следующие поля:
          */
 //        $oFaker->lastName . ' ' . $oFaker->middleNameMale . ' ' . $oFaker->firstNameMale
-        $name = new PersonName($this->oFaker->firstNameMale, $this->oFaker->lastName, $this->oFaker->middleNameMale);
-        $bithday = new PersonBirthday($this->oFaker->date('Y-m-d', '1995-10-17'), $this->oFaker->city);
 
-        $oPerson = Person::createMale(
+        $sDop = '';
+        if( isset($params['customerid']) ) {
+            $sDop = ' ' . $params['customerid'];
+        }
+
+        $name = new PersonName($this->oFaker->firstNameMale(), $this->oFaker->lastName(), $this->oFaker->middleNameMale());
+        $bithday = new PersonBirthday($this->oFaker->date('Y-m-d', '1995-10-17'), $this->oFaker->city . $sDop);
+//        echo iconv('UTF-8', 'CP866', print_r($name, true) . ' ' . $this->oFaker->firstNameMale() . "\n");
+
+//        $oPerson = Person::createMale(
+//            $name,
+//            $bithday
+//        );
+
+        $oPerson = new Person(
             $name,
             $bithday
         );
+        $oPerson->setMale();
 
         $oPerson->addPhone($this->oFaker->numerify('79#########'));
 
+        if( !empty($sDop) ) {
+            $oPerson->addEmail(trim($sDop) . '.' . $this->oFaker->email);
+        }
 
         /*
          * Без этих полей лид создается
@@ -140,6 +156,11 @@ class DataGenerator
         //  [status] => TECH_FAULT
         //  [info] => code: METADATA__EMPTY_REQUIRED_FIELD; message: gettingMoneyMethodId
 
+        if( isset($params['gettingmoneymethod']) ) {
+            $oPerson->gettingMoneyMethodId = $this->getGettingMoneyMethod($params['gettingmoneymethod']);
+        }
+
+        // тут у некоторых видов продукта не хватает данных, поэтому сделал там в фильтре только один продукт, который прошел
 
         return $oPerson;
     }
@@ -151,17 +172,21 @@ class DataGenerator
     public function getProduct($aProductList = []) {
         $aProductList = array_filter(
             $aProductList,
-            function ($el) { return $el->active; }
+            function ($el) { return $el->id == 1013331; /* return $el->active; */ }
         );
 
         $aKeys = array_keys($aProductList);
 
-        $usedKey = $aKeys[$this->oFaker->numberBetween(0, count($aKeys))];
+        $usedKey = $aKeys[$this->oFaker->numberBetween(0, count($aKeys) -1)];
 
         return $aProductList[$usedKey];
     }
 
 
+    /**
+     * @param $obProduct
+     * @return \brainysoft\testmultibase\Credit
+     */
     public function createCreditForProduct($obProduct) {
         $nMinDays = $obProduct->minPeriod;
         $nMaxDays = $obProduct->maxPeriod;
@@ -211,5 +236,28 @@ class DataGenerator
         );
 
         return $ob;
+    }
+
+    /**
+     * @param $aMethods
+     * @return mixed
+     */
+    public function getGettingMoneyMethod($aMethods) {
+        $usedKey = $this->oFaker->numberBetween(0, count($aMethods) - 1);
+        return $aMethods[$usedKey]->id;
+    }
+
+    /**
+     * @param string $customerId
+     * @return string
+     */
+    public function generateMac($customerId = '') {
+        if( empty($customerId) ) {
+            return $customerId;
+        }
+
+        $a = str_split($customerId, 2);
+
+        return '';
     }
 }
